@@ -21,7 +21,7 @@ namespace Nutty {
             if (Program.frontlineActive) {
 
                 // Get the Frontline Channel
-                var channel = await Program.discord.GetChannelAsync(ulong.Parse(Holder.Instance.channelIds["Frontlne_Channel"]));
+                var channel = await Program.discord.GetChannelAsync(ulong.Parse(Holder.Instance.channelIds["Frontline_Channel"]));
 
                 // Calculate Frontline Starting Time
                 int hour = 4 * Program.timeSlot;
@@ -34,7 +34,12 @@ namespace Nutty {
                 TimeSpan timeDif = frontline.Subtract(now);
 
                 // Send a message in Frontline Channel informing uses of time until Frontline.
-                await channel.SendMessageAsync($"Frontline is Starting in {timeDif.TotalMinutes}!");
+                if (timeDif.Hours > 0) {
+                    await channel.SendMessageAsync($"Frontline is starting in {timeDif.Hours}h {timeDif.Minutes}min!");
+                }
+                else {
+                    await channel.SendMessageAsync($"Frontline is starting in {timeDif.Minutes}min!");
+                }
             }
         }
     }

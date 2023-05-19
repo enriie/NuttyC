@@ -44,7 +44,6 @@ namespace Nutty
                                         .ForJob(jobEarly)
                                         .Build();
 
-
             var jobReminder = JobBuilder.Create<FrotnlineNotifier>()
                                 .WithIdentity("frontline_notifier_reminder", "frontline")
                                 .Build();
