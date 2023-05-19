@@ -21,7 +21,7 @@ namespace Nutty {
             if (Program.frontlineActive) {
 
                 // Get the Frontline Channel
-                var channel = await Program.discord.GetChannelAsync(ulong.Parse(Holder.Instance.channelIds["Frontline"]));
+                var channel = await Program.discord.GetChannelAsync(ulong.Parse(Holder.Instance.channelIds["Frontlne_Channel"]));
 
                 // Calculate Frontline Starting Time
                 int hour = 4 * Program.timeSlot;
