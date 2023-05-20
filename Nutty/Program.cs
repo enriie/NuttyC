@@ -34,13 +34,16 @@ namespace Nutty
             await scheduler.Start();
 
             // Making Jobs & Triggers for Frontline
+            var utcHour = 11 + (6 * (timeSlot - 1));
+            if (utcHour > 24) { utcHour -= 24; }
+
             var jobEarly = JobBuilder.Create<FrotnlineNotifier>()
                                 .WithIdentity("frontline_notifier_early", "frontline")
                                 .Build();
 
             var triggerEarly = TriggerBuilder.Create()
                                         .WithIdentity("1h", "frontline")
-                                        .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(3 + (6 * (timeSlot - 1)), 0).InTimeZone(TimeZoneInfo.Utc))
+                                        .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(utcHour, 0).InTimeZone(TimeZoneInfo.Utc))
                                         .ForJob(jobEarly)
                                         .Build();
 
@@ -50,7 +53,7 @@ namespace Nutty
 
             var triggerReminder = TriggerBuilder.Create()
                                         .WithIdentity("30min", "frontline")
-                                        .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(3 + (6 * (timeSlot - 1)), 30).InTimeZone(TimeZoneInfo.Utc))
+                                        .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(utcHour, 30).InTimeZone(TimeZoneInfo.Utc))
                                         .ForJob(jobReminder)
                                         .Build();
 
@@ -60,7 +63,7 @@ namespace Nutty
 
             var triggerStarting = TriggerBuilder.Create()
                                         .WithIdentity("5min", "frontline")
-                                        .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(3 + (6 * (timeSlot - 1)), 55).InTimeZone(TimeZoneInfo.Utc))
+                                        .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(utcHour, 55).InTimeZone(TimeZoneInfo.Utc))
                                         .ForJob(jobStarting)
                                         .Build();
 

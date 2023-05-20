@@ -26,7 +26,7 @@ namespace Nutty.Commands {
         [Command("score")]
         public async Task Score(CommandContext ctx, int score, int multiplier) {
             await ctx.Message.DeleteAsync();
-            if (ctx.Channel.Id == frontline_id | ctx.Channel.Id == debug_id) {
+            if (ctx.Channel.Id == boss_id | ctx.Channel.Id == debug_id) {
                 await ctx.RespondAsync($"{ctx.Member.DisplayName}, your total score is: {CommandLogic.Score(score, multiplier)}. You had a base score of : {score}, and had the multipler of {multiplier}.");
             }
             else {

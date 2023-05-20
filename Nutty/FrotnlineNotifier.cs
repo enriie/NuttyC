@@ -24,11 +24,17 @@ namespace Nutty {
                 var channel = await Program.discord.GetChannelAsync(ulong.Parse(Holder.Instance.channelIds["Frontline_Channel"]));
 
                 // Calculate Frontline Starting Time
-                int hour = 4 * Program.timeSlot;
+                int hour = 12 + (6 * (Program.timeSlot - 1));
+                var addDay = false;
+                if (hour > 24) {
+                    hour -= 24;
+                    addDay = true;
+                }
 
                 // Get DateTime data used for Time Difference calculation
                 DateTime now = DateTime.UtcNow;
                 DateTime frontline = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, 0, 0, DateTimeKind.Utc);
+                if (addDay) { frontline.AddDays(1); }
 
                 // Get time left until Frontline
                 TimeSpan timeDif = frontline.Subtract(now);
