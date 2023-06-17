@@ -4,6 +4,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -99,6 +100,64 @@ namespace Nutty.Commands {
                 }
             }
         }
+
+
+        /// <summary>
+        /// Store plan for Frontline.
+        /// </summary>
+        /// <param name="ctx"> Discord Command Context </param>
+        /// <param name="plan">  </param>
+        /// <returns></returns>
+        [Command("sPlan")]
+        public async Task StorePlan(CommandContext ctx, params string[] args) {
+            await ctx.Message.DeleteAsync();
+            if (Program.isUserAdmin(ctx.Member)) {
+                File.WriteAllText(@"plan.txt", string.Join("", args));
+
+                var response = await ctx.RespondAsync("Plan was stored");
+
+                await Task.Delay(10000);
+                await response.DeleteAsync();
+            }
+        }
+
+        /// <summary>
+        /// Clear the plan for Frontline.
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        [Command("cPlan")]
+        public async Task ClearPlan(CommandContext ctx) {
+            await ctx.Message.DeleteAsync();
+            if (Program.isUserAdmin(ctx.Member)) {
+                File.WriteAllText(@"plain.txt", "");
+            }
+        }
+
+        /// <summary>
+        /// Show the plan for frontlien in #Frontlien channel.
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        [Command("plan")]
+        public async Task ShowPlan(CommandContext ctx) {
+            await ctx.Message.DeleteAsync();
+            if (ctx.Channel.Id != frontline_id | ctx.Channel.Id != debug_id) {
+                var response = await ctx.RespondAsync($"Wrong Channel");
+                await Task.Delay(5000);
+                await response.DeleteAsync();
+
+                return;
+          }
+
+            var planText = "";
+            planText = File.ReadAllText(@"plan.txt");
+            if (planText.Length > 0) {
+                ctx.RespondAsync(planText);
+            }
+        }
+
+
 
     }
 }
