@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Nutty.Commands;
+using Nutty.Commands.Jobs;
 using Quartz;
 using Quartz.Impl;
 using System.Configuration;
@@ -67,10 +68,21 @@ namespace Nutty
                                         .ForJob(jobStarting)
                                         .Build();
 
+            var jobCleanup = JobBuilder.Create<Cleaner>()
+                .WithIdentity("fl_cleanup", "cleaner")
+                .Build();
+
+            var triggerCleanup = TriggerBuilder.Create()
+                .WithIdentity("cfl_cleanup", "cleaner")
+                .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(utcHour + 1, 35).InTimeZone(TimeZoneInfo.Utc))
+                .ForJob(jobCleanup)
+                .Build();
+
             // Registering Jobs and their Triggers for Frontline.
             await scheduler.ScheduleJob(jobEarly, triggerEarly);
             await scheduler.ScheduleJob(jobReminder, triggerReminder);
             await scheduler.ScheduleJob(jobStarting, triggerStarting);
+            await scheduler.ScheduleJob(jobCleanup, triggerCleanup);
 
             // Loading Discord Bot settings.
             config = JObject.Parse(File.ReadAllText("appSettings.json"));
@@ -97,7 +109,7 @@ namespace Nutty
             var commandsSlash = discord.UseSlashCommands();
 
             commandsNext.RegisterCommands<TraditionalCommands>();
-            commandsSlash.RegisterCommands<SlashCommands>();
+//            commandsSlash.RegisterCommands<SlashCommands>();
 
             // Upadting Discord Bot Activity/Status on Ready.
             discord.Ready += async (s, e) => {

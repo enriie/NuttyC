@@ -6,27 +6,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nutty {
-    public class FrotnlineNotifier : IJob {
+namespace Nutty.Commands.Jobs
+{
+    public class FrotnlineNotifier : IJob
+    {
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
-        public async Task Execute(IJobExecutionContext context) {
-            Console.WriteLine("Triggered");
+        public async Task Execute(IJobExecutionContext context)
+        {
+            Console.WriteLine("Frontline Notifier triggered");
 
             // Checks if Frontline is Currently Active
-            if (Program.frontlineActive) {
+            if (Program.frontlineActive)
+            {
+                Console.WriteLine("Frontline is Active, sending the reminder in #frontline channel");
 
                 // Get the Frontline Channel
                 var channel = await Program.discord.GetChannelAsync(ulong.Parse(Holder.Instance.channelIds["Frontline_Channel"]));
 
                 // Calculate Frontline Starting Time
-                int hour = 12 + (6 * (Program.timeSlot - 1));
+                int hour = 12 + 6 * (Program.timeSlot - 1);
                 var addDay = false;
-                if (hour > 24) {
+                if (hour > 24)
+                {
                     hour -= 24;
                     addDay = true;
                 }
@@ -40,13 +46,17 @@ namespace Nutty {
                 TimeSpan timeDif = frontline.Subtract(now);
 
                 // Send a message in Frontline Channel informing uses of time until Frontline.
-                if (timeDif.Hours > 0) {
+                if (timeDif.Hours > 0)
+                {
                     await channel.SendMessageAsync($"Frontline is starting in {timeDif.Hours}h {timeDif.Minutes}min!");
                 }
-                else {
+                else
+                {
                     await channel.SendMessageAsync($"Frontline is starting in {timeDif.Minutes}min!");
                 }
             }
+
+            Console.WriteLine("Frontline is Inactive");
         }
     }
 }
