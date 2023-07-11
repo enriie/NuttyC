@@ -27,6 +27,12 @@ namespace Nutty
 
         public static JObject config;
 
+
+        public static DiscordEmbedBuilder helpEmbedBuilder = new DiscordEmbedBuilder() {
+            Color = DiscordColor.Yellow,
+            Title = "Nutty Commands"
+        };
+
         public static async Task Main(string[] args) {
             Console.WriteLine("Setting up Quartz Scheduler!");
             // Setup Quartz Scheduler Factory & Scheduler
@@ -49,8 +55,8 @@ namespace Nutty
                                         .Build();
 
             var jobReminder = JobBuilder.Create<FrotnlineNotifier>()
-                                .WithIdentity("frontline_notifier_reminder", "frontline")
-                                .Build();
+                                        .WithIdentity("frontline_notifier_reminder", "frontline")
+                                        .Build();
 
             var triggerReminder = TriggerBuilder.Create()
                                         .WithIdentity("30min", "frontline")
@@ -59,8 +65,8 @@ namespace Nutty
                                         .Build();
 
             var jobStarting = JobBuilder.Create<FrotnlineNotifier>()
-                                .WithIdentity("frontline_notifier_starting", "frontline")
-                                .Build();
+                                        .WithIdentity("frontline_notifier_starting", "frontline")
+                                        .Build();
 
             var triggerStarting = TriggerBuilder.Create()
                                         .WithIdentity("5min", "frontline")
@@ -73,10 +79,10 @@ namespace Nutty
                 .Build();
 
             var triggerCleanup = TriggerBuilder.Create()
-                .WithIdentity("cfl_cleanup", "cleaner")
-                .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(utcHour + 1, 35).InTimeZone(TimeZoneInfo.Utc))
-                .ForJob(jobCleanup)
-                .Build();
+                                        .WithIdentity("cfl_cleanup", "cleaner")
+                                        .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(utcHour + 1, 30).InTimeZone(TimeZoneInfo.Utc))
+                                        .ForJob(jobCleanup)
+                                        .Build();
 
             // Registering Jobs and their Triggers for Frontline.
             await scheduler.ScheduleJob(jobEarly, triggerEarly);
@@ -96,6 +102,9 @@ namespace Nutty
                 MinimumLogLevel = LogLevel.None
             });
 
+            var user = await discord.GetUserAsync(476034736817438740);
+            helpEmbedBuilder.Description = $"You don't need to type the \'<>\' just the value.\nput a \'-\' before commands.\nIf you have any issues or feedback contact **{user.Mention}**.";
+
             frontlineActive = (bool)config["Frontline_State"];
 
             Console.WriteLine("Registering Traditional & Slash Commands!");
@@ -106,7 +115,20 @@ namespace Nutty
 
             });
 
-            var commandsSlash = discord.UseSlashCommands();
+
+            var gbr_ch = await discord.GetChannelAsync(ulong.Parse(Holder.Instance.channelIds["Commands_Channel"]));
+            var fl_ch = await discord.GetChannelAsync(ulong.Parse(Holder.Instance.channelIds["Frontline_Channel"]));
+
+            helpEmbedBuilder.AddField("score <base value> <multiplier>", $"Calculates GBR score, only usable in {gbr_ch.Mention}", false);
+            helpEmbedBuilder.AddField("golem <1> <2> <3> <4> <5>", $"Calculates golem score, only usable in {gbr_ch.Mention}", false);
+            helpEmbedBuilder.AddField("plan", $"Shows the stored plan, only works in {fl_ch.Mention}", false);
+
+            helpEmbedBuilder.AddField("sPlan <plan>", "Stores the message after \'sPlan\' for later use by \'plan\' command. Only usable by Admins.", false);
+            helpEmbedBuilder.AddField("cPlan", "Clears the stored plan. Only usable by Admins.", false);
+
+            helpEmbedBuilder.AddField("frontlineInfo", "Shows frontline notifier & timeslot info.", false);
+            helpEmbedBuilder.AddField("frontlineToggle", "Toggles frontline notification On/Off. Only usable by Admins.", false);
+            helpEmbedBuilder.AddField("frontlineTimeSlot <1-4>", "Changes frontline notifier timeslot. Only usable by Admins.", false);
 
             commandsNext.RegisterCommands<TraditionalCommands>();
 //            commandsSlash.RegisterCommands<SlashCommands>();
@@ -124,7 +146,7 @@ namespace Nutty
             Console.WriteLine("Nutty has Started!");
 
             // Exit with Confirmation
-            EndPoint:
+            Quit:
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Press any key to exit...");
             Console.ResetColor();
@@ -142,12 +164,12 @@ namespace Nutty
                     discord.DisconnectAsync().GetAwaiter().GetResult();
                 }
                 else {
-                    goto EndPoint;
+                    goto Quit;
                 }
             }
             else {
                 Console.WriteLine("Invalid input.");
-                goto EndPoint;
+                goto Quit;
             }
         }
 

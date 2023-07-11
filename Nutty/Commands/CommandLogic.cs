@@ -67,12 +67,12 @@ namespace Nutty.Commands {
         /// <param name="slot"></param>
         /// <returns></returns>
         public static bool ChangeFrontlineTimeslot(int slot) {
-            if (slot >= 0 && slot < 5) {
+            if (slot > 0 && slot < 5) {
                 Program.timeSlot = slot;
                 return true;
             }
             else {
-                Program.timeSlot = 0;
+                Program.timeSlot = 1;
                 return false;
             }
         }

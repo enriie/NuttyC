@@ -1,9 +1,11 @@
 ﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,7 +48,7 @@ namespace Nutty.Commands {
         /// <param name="g5">Amount of 5th Golems destroyed</param>
         /// <returns></returns>
         [Command("golem")]
-        public async Task GolemScore(CommandContext ctx, int g1, int g2, int g3, int g4, int g5) {
+        public async Task GolemScore(CommandContext ctx, int g1, int g2 = 0, int g3 = 0, int g4 = 0, int g5 = 0) {
             await ctx.Message.DeleteAsync();
             if (ctx.Channel.Id == boss_id | ctx.Channel.Id == debug_id) {
                 await ctx.RespondAsync($"{ctx.Member.DisplayName}, your total score is: {CommandLogic.GolemTotalScore(g1, g2, g3, g4, g5)}. " +
@@ -101,6 +103,16 @@ namespace Nutty.Commands {
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
+        [Command("frontlineInfo")]
+        public async Task FrontlineInfo(CommandContext ctx) {
+            await ctx.Message.DeleteAsync();
+            await ctx.RespondAsync($"Frontline Info: \nFrontline Status:{Program.frontlineActive}\nFrontline Timeslot:{Program.timeSlot}");
+        }
 
         /// <summary>
         /// Store plan for Frontline.
@@ -157,7 +169,14 @@ namespace Nutty.Commands {
             }
         }
 
+        // --- Seperator --- This shouldn't be done this way lol
 
+
+        [Command("helpMe")]
+        public async Task Help(CommandContext ctx) {
+            await ctx.Message.DeleteAsync();
+            await ctx.RespondAsync(Program.helpEmbedBuilder.Build());
+        }
 
     }
 }

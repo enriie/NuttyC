@@ -55,8 +55,9 @@ namespace Nutty.Commands.Jobs
                     await channel.SendMessageAsync($"Frontline is starting in {timeDif.Minutes}min!");
                 }
             }
-
-            Console.WriteLine("Frontline is Inactive");
+            else {
+                Console.WriteLine("Frontline is Inactive");
+            }
         }
     }
 }
